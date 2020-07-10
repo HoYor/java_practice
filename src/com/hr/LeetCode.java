@@ -6,7 +6,7 @@ import java.util.zip.ZipInputStream;
 public class LeetCode {
     public static void main(String[] args){
         LeetCode leetCode = new LeetCode();
-        System.out.println(leetCode.strStr("aaaaa","bba"));
+        System.out.println(leetCode.mySqrt(9));
     }
 
     /**
@@ -606,22 +606,407 @@ public class LeetCode {
      * 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
      */
     public int maxSubArray(int[] nums) {
-        // 动态规划
-        int sum = nums[0];
-        int cur = sum;
-        for (int i = 1; i < nums.length; i++) {
-            if (sum + nums[i] < 0) {
-                cur = Math.max(cur, nums[i]);
-            } else {
-                cur = sum + nums[i];
+        int max = nums[0];
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            if(sum > max){
+                max = sum;
             }
-            if (nums[i] > 0) {
-                sum = Math.max(sum + nums[i], nums[i]);
-            } else {
-                cur = sum + nums[i];
+            if(sum < 0){
+                sum = 0;
             }
-
         }
-        return 0;
+        return max;
     }
+
+    /**
+     * 给定一个仅包含大小写字母和空格 ' ' 的字符串 s，返回其最后一个单词的长度。如果字符串从左向右滚动显示，那么最后一个单词就是最后出现的单词。
+     * 如果不存在最后一个单词，请返回 0 。
+     * 说明：一个单词是指仅由字母组成、不包含任何空格字符的 最大子字符串。
+     *
+     * 示例:
+     * 输入: "Hello World"
+     * 输出: 5
+     */
+    public int lengthOfLastWord(String s) {
+//        String[] words = s.split(" ");
+//        if(words.length > 0){
+//            return words[words.length-1].length();
+//        }else{
+//            return 0;
+//        }
+        int len = 0;
+        for (int i = s.length()-1; i >= 0; i--) {
+            if(s.charAt(i) != ' '){
+                len++;
+            }else if(len > 0){
+                return len;
+            }
+        }
+        return len;
+    }
+
+    /**
+     * 给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。
+     * 最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+     * 你可以假设除了整数 0 之外，这个整数不会以零开头。
+     *
+     * 示例 1:
+     * 输入: [1,2,3]
+     * 输出: [1,2,4]
+     * 解释: 输入数组表示数字 123。
+     *
+     * 示例 2:
+     * 输入: [4,3,2,1]
+     * 输出: [4,3,2,2]
+     * 解释: 输入数组表示数字 4321。
+     */
+    public int[] plusOne(int[] digits) {
+        int i = digits.length-1;
+        while (i >= 0) {
+            if(digits[i]+1 == 10){
+                digits[i] = 0;
+                i--;
+            }else{
+                digits[i] += 1;
+                return digits;
+            }
+        }
+        int[] newDigits = new int[digits.length+1];
+        newDigits[0] = 1;
+        return newDigits;
+    }
+
+    /**
+     * 给你两个二进制字符串，返回它们的和（用二进制表示）。
+     * 输入为 非空 字符串且只包含数字 1 和 0。
+     *
+     * 示例 1:
+     * 输入: a = "11", b = "1"
+     * 输出: "100"
+     *
+     * 示例 2:
+     * 输入: a = "1010", b = "1011"
+     * 输出: "10101"
+     *  
+     *
+     * 提示：
+     * 每个字符串仅由字符 '0' 或 '1' 组成。
+     * 1 <= a.length, b.length <= 10^4
+     * 字符串如果不是 "0" ，就都不含前导零。
+     */
+    public String addBinary(String a, String b) {
+        char[] aArr,bArr;
+        if(a.length() > b.length()){
+            aArr = a.toCharArray();
+            bArr = b.toCharArray();
+        }else{
+            bArr = a.toCharArray();
+            aArr = b.toCharArray();
+        }
+        boolean plusOne = false;
+        for (int i = 0; i < aArr.length; i++) {
+            char aChar = aArr[aArr.length-1-i];
+            char bChar;
+            if(i < bArr.length){
+                bChar = bArr[bArr.length-1-i];
+            }else if(plusOne){
+                bChar = '1';
+                plusOne = false;
+            }else{
+                break;
+            }
+            if(((bChar == '0') && plusOne) || ((bChar == '1') && !plusOne)){
+                aArr[aArr.length-1-i] = aChar == '0' ? '1' : '0';
+            }
+            if((plusOne && aChar == '0' && bChar == '0') || (!plusOne && aChar == '1' && bChar == '1')){
+                plusOne = !plusOne;
+            }
+        }
+        if(plusOne){
+            return "1"+new String(aArr);
+        }else{
+            return new String(aArr);
+        }
+    }
+
+    /**
+     * 实现 int sqrt(int x) 函数。
+     * 计算并返回 x 的平方根，其中 x 是非负整数。
+     * 由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
+     *
+     * 示例 1:
+     * 输入: 4
+     * 输出: 2
+     *
+     * 示例 2:
+     * 输入: 8
+     * 输出: 2
+     * 说明: 8 的平方根是 2.82842...,
+     *      由于返回类型是整数，小数部分将被舍去。
+     */
+    public int mySqrt(int x) {
+//        思考更优解
+        if(x < 2){
+            return x;
+        }
+        return mySqrtHelpFun(x/2, (int)Math.ceil(x/4f), x);
+    }
+
+    private int mySqrtHelpFun(int value, int gap, int x){
+//        System.out.println(value+"-"+gap);
+        float divide = x/value;
+        if(divide == value){
+            return value;
+        } else if(divide > value){
+            if(gap == 1 && (value+1)>x/(value+1)){
+                return value;
+            }
+            return mySqrtHelpFun(value+gap, (int)Math.ceil(gap/2f), x);
+        }else {
+            return mySqrtHelpFun(value-gap, (int)Math.ceil(gap/2f), x);
+        }
+    }
+
+    /**
+     * 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+     * 每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+     * 注意：给定 n 是一个正整数。
+     *
+     * 示例 1：
+     * 输入： 2
+     * 输出： 2
+     * 解释： 有两种方法可以爬到楼顶。
+     * 1.  1 阶 + 1 阶
+     * 2.  2 阶
+     *
+     * 示例 2：
+     * 输入： 3
+     * 输出： 3
+     * 解释： 有三种方法可以爬到楼顶。
+     * 1.  1 阶 + 1 阶 + 1 阶
+     * 2.  1 阶 + 2 阶
+     * 3.  2 阶 + 1 阶
+     */
+    public int climbStairs(int n) {
+//        时间太长，因为有太多重复计算
+//        if(n < 3){
+//            return n;
+//        }
+//        return climbStairs(n-1)+climbStairs(n-2);
+        int pre1 = 1;
+        int pre2 = 1;
+        int total = 1;
+        for (int i = 1; i < n; i++) {
+            total = pre1+pre2;
+            pre1 = pre2;
+            pre2 = total;
+        }
+        return total;
+    }
+
+    /**
+     * 给定一个排序链表，删除所有重复的元素，使得每个元素只出现一次。
+     *
+     * 示例 1:
+     * 输入: 1->1->2
+     * 输出: 1->2
+     *
+     * 示例 2:
+     * 输入: 1->1->2->3->3
+     * 输出: 1->2->3
+     */
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode first = head;
+        while (head != null && head.next != null){
+            if(head.next.val == head.val){
+                head.next = head.next.next;
+            }else{
+                head = head.next;
+            }
+        }
+        return first;
+    }
+
+    /**
+     * 给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
+     *
+     * 说明:
+     * 初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。
+     * 你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素。
+     *  
+     *
+     * 示例:
+     * 输入:
+     * nums1 = [1,2,3,0,0,0], m = 3
+     * nums2 = [2,5,6],       n = 3
+     * 输出: [1,2,2,3,5,6]
+     */
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int point1 = m-1,point2 = n-1;
+        for (int i = m+n-1; i >= 0; i--) {
+            if(point2 < 0){
+                break;
+            }
+            if(point1 < 0 || nums1[point1] < nums2[point2]){
+                nums1[i] = nums2[point2];
+                point2--;
+            }else {
+                nums1[i] = nums1[point1];
+                point1--;
+            }
+        }
+    }
+
+    /**
+     * 给定两个二叉树，编写一个函数来检验它们是否相同。
+     * 如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+     *
+     * 示例 1:
+     * 输入:       1         1
+     *           / \       / \
+     *          2   3     2   3
+     *
+     *         [1,2,3],   [1,2,3]
+     * 输出: true
+     *
+     * 示例 2:
+     * 输入:      1          1
+     *           /           \
+     *          2             2
+     *
+     *         [1,2],     [1,null,2]
+     *
+     * 输出: false
+     *
+     * 示例 3:
+     * 输入:       1         1
+     *           / \       / \
+     *          2   1     1   2
+     *
+     *         [1,2,1],   [1,1,2]
+     * 输出: false
+     */
+     // Definition for a binary tree node.
+     public class TreeNode {
+         int val;
+         TreeNode left;
+         TreeNode right;
+         TreeNode(int x) { val = x; }
+     }
+
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+         if((p == null && q != null) || (p != null && q == null)){
+             return false;
+         }else if(p == null){
+             return true;
+         }else {
+             return p.val == q.val && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+         }
+    }
+
+    /**
+     * 给定一个二叉树，检查它是否是镜像对称的。
+     * 例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+     *
+     *     1
+     *    / \
+     *   2   2
+     *  / \ / \
+     * 3  4 4  3
+     *  
+     *
+     * 但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+     *
+     *     1
+     *    / \
+     *   2   2
+     *    \   \
+     *    3    3
+     *  
+     *
+     * 进阶：
+     * 你可以运用递归和迭代两种方法解决这个问题吗？
+     */
+    public boolean isSymmetric(TreeNode root) {
+        if(root == null){
+            return true;
+        }
+        return isSymmetricHelpFun(root.left, root.right);
+    }
+
+    private boolean isSymmetricHelpFun(TreeNode left, TreeNode right){
+        if(left == null && right == null){
+            return true;
+        }else if(left == null || right == null || left.val != right.val){
+            return false;
+        }else {
+            return isSymmetricHelpFun(left.right, right.left) && isSymmetricHelpFun(left.left, right.right);
+        }
+    }
+
+    /**
+     * 给定一个二叉树，找出其最大深度。
+     * 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+     *
+     * 说明: 叶子节点是指没有子节点的节点。
+     *
+     * 示例：
+     * 给定二叉树 [3,9,20,null,null,15,7]，
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最大深度 3 。
+     */
+    public int maxDepth(TreeNode root) {
+        if(root == null){
+            return 0;
+        }else if(root.left == null && root.right == null){
+            return 1;
+        }else{
+            return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+        }
+    }
+
+    /**
+     * 给定一个二叉树，返回其节点值自底向上的层次遍历。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
+     *
+     * 例如：
+     * 给定二叉树 [3,9,20,null,null,15,7],
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回其自底向上的层次遍历为：
+     *
+     * [
+     *   [15,7],
+     *   [9,20],
+     *   [3]
+     * ]
+     */
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> result = new LinkedList<>();
+        levelOrderBottomHelpFun(result, 0, root);
+        return result;
+    }
+
+    private void levelOrderBottomHelpFun(List<List<Integer>> result, int index, TreeNode node){
+        if(node == null){
+            return;
+        }
+        if(index >= result.size()){
+            result.add(0, new ArrayList<>());
+        }
+        result.get(result.size()-1-index).add(node.val);
+        levelOrderBottomHelpFun(result, index+1, node.left);
+        levelOrderBottomHelpFun(result, index+1, node.right);
+    }
+
 }
