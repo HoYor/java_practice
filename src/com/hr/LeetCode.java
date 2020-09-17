@@ -1,12 +1,12 @@
 package com.hr;
 
 import java.util.*;
-import java.util.zip.ZipInputStream;
 
 public class LeetCode {
     public static void main(String[] args){
-        LeetCode leetCode = new LeetCode();
-        System.out.println(leetCode.mySqrt(9));
+//        LeetCode leetCode = new LeetCode();
+//        System.out.println(leetCode.mySqrt(9));
+        System.out.println(0b101^0b11);
     }
 
     /**
@@ -989,8 +989,7 @@ public class LeetCode {
      *   [15,7],
      *   [9,20],
      *   [3]
-     * ]
-     */
+     * */
     public List<List<Integer>> levelOrderBottom(TreeNode root) {
         List<List<Integer>> result = new LinkedList<>();
         levelOrderBottomHelpFun(result, 0, root);
@@ -1008,5 +1007,497 @@ public class LeetCode {
         levelOrderBottomHelpFun(result, index+1, node.left);
         levelOrderBottomHelpFun(result, index+1, node.right);
     }
+
+    /**
+     * 将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
+     *
+     * 本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。
+     *
+     * 示例:
+     * 给定有序数组: [-10,-3,0,5,9],
+     * 一个可能的答案是：[0,-3,9,-10,null,5]，它可以表示下面这个高度平衡二叉搜索树：
+     *
+     *       0
+     *      / \
+     *    -3   9
+     *    /   /
+     *  -10  5
+     */
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if(nums.length == 0){
+            return null;
+        }
+        TreeNode treeNode = new TreeNode(nums[nums.length/2]);
+        int leftLength = nums.length/2;
+        if(leftLength > 0){
+            int[] left = new int[leftLength];
+            for (int i = 0; i < leftLength; i++) {
+                left[i] = nums[i];
+            }
+            treeNode.left = sortedArrayToBST(left);
+            int rightLength = nums.length - leftLength - 1;
+            if(rightLength > 0){
+                int[] right= new int[rightLength];
+                for (int i = leftLength+1; i < nums.length; i++) {
+                    right[i-leftLength-1] = nums[i];
+                }
+                treeNode.right = sortedArrayToBST(right);
+            }
+        }
+        return treeNode;
+    }
+
+    /**
+     * 给定一个二叉树，判断它是否是高度平衡的二叉树。
+     * 本题中，一棵高度平衡二叉树定义为：
+     * 一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过1。
+     *
+     * 示例 1:
+     * 给定二叉树 [3,9,20,null,null,15,7]
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回 true
+     *
+     * 示例 2:
+     * 给定二叉树 [1,2,2,3,3,null,null,4,4]
+     *
+     *        1
+     *       / \
+     *      2   2
+     *     / \
+     *    3   3
+     *   / \
+     *  4   4
+     * 返回 false
+     */
+    public boolean isBalanced(TreeNode root) {
+        // 有点扯淡，明明说了是个二叉树，一个null算毛线的二叉树呀
+        if(root == null){
+            return true;
+        }
+        int leftDeep = isBalancedHelpFun(root.left, 0);
+        int rightDeep = isBalancedHelpFun(root.right, 0);
+        return leftDeep >= 0 && rightDeep >= 0 && Math.abs(leftDeep - rightDeep) <= 1;
+    }
+
+    private int isBalancedHelpFun(TreeNode root, int deep){
+        if(root == null){
+            return deep;
+        }
+        int leftDeep = isBalancedHelpFun(root.left, deep + 1);
+        int rightDeep = isBalancedHelpFun(root.right, deep + 1);
+        if(leftDeep >= 0 && rightDeep >= 0 && Math.abs(leftDeep - rightDeep) <= 1){
+            return Math.max(leftDeep, rightDeep);
+        }
+        return -1;
+    }
+
+    /**
+     * 给定一个二叉树，找出其最小深度。
+     * 最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+     * 说明: 叶子节点是指没有子节点的节点。
+     *
+     * 示例:
+     * 给定二叉树 [3,9,20,null,null,15,7],
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最小深度  2.
+     */
+    public int minDepth(TreeNode root) {
+        if(root == null){
+            return 0;
+        }
+        if(root.left == null && root.right == null){
+            return 1;
+        }else if(root.left == null || root.right == null){
+            return 1+Math.max(minDepth(root.left), minDepth(root.right));
+        }
+        return 1+Math.min(minDepth(root.left), minDepth(root.right));
+    }
+
+    /**
+     * 给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+     * 说明: 叶子节点是指没有子节点的节点。
+     *
+     * 示例: 
+     * 给定如下二叉树，以及目标和 sum = 22，
+     *               5
+     *              / \
+     *             4   8
+     *            /   / \
+     *           11  13  4
+     *          /  \      \
+     *         7    2      1
+     * 返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2
+     */
+    public boolean hasPathSum(TreeNode root, int sum) {
+        // 真扯淡，上面null算二叉树，这里又不算了
+        if(root == null){
+            return false;
+        }
+        if(root.left == null && root.right == null){
+            return sum == root.val;
+        }
+        if(root.left != null){
+            if(hasPathSum(root.left, sum - root.val)){
+                return true;
+            }
+        }
+        return hasPathSum(root.right, sum - root.val);
+    }
+
+    /**
+     * 给定一个非负整数 numRows，生成杨辉三角的前 numRows 行。
+     *
+     * 示例:
+     * 输入: 6
+     * 输出:
+     * [
+     *      [1],
+     *     [1,1],
+     *    [1,2,1],
+     *   [1,3,3,1],
+     *  [1,4,6,4,1],
+     * [1,5,10,10,5,1]
+     * ]
+     */
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> listList = new ArrayList<>();
+        for (int i = 0; i < numRows; i++) {
+            List<Integer> list = new ArrayList<>();
+            for (int j = 0; j < i + 1; j++) {
+                int left = 0,right = 0;
+                if(i == 0){
+                    left = 1;
+                } else if(j > 0){
+                    left = listList.get(i-1).get(j-1);
+                }
+                if(j < i){
+                    right = listList.get(i-1).get(j);
+                }
+                list.add(left+right);
+            }
+            listList.add(list);
+        }
+        return listList;
+    }
+
+    /**
+     * 给定一个非负索引 k，其中 k ≤ 33，返回杨辉三角的第 k 行。
+     *
+     * 示例:
+     * 输入: 3
+     * 输出: [1,3,3,1]
+     */
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> list = new ArrayList<>();
+        return list;
+    }
+
+    /**
+     * 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+     * 如果你最多只允许完成一笔交易（即买入和卖出一支股票一次），设计一个算法来计算你所能获取的最大利润。
+     * 注意：你不能在买入股票前卖出股票。
+     *
+     * 示例 1:
+     * 输入: [7,1,5,3,6,4]
+     * 输出: 5
+     * 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     *      注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+     *
+     * 示例 2:
+     * 输入: [7,6,4,3,1]
+     * 输出: 0
+     * 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+     */
+    public int maxProfit(int[] prices) {
+        int max = 0;
+        if(prices.length > 1){
+            int buy = prices[0];
+            for (int i = 1; i < prices.length; i++) {
+                if(prices[i] < buy){
+                    buy = prices[i];
+                }else{
+                    max = Math.max(max, prices[i] - buy);
+                }
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+     * 注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     *
+     * 示例 1:
+     * 输入: [7,1,5,3,6,4]
+     * 输出: 7
+     * 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     *      随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
+     *
+     * 示例 2:
+     * 输入: [1,2,3,4,5]
+     * 输出: 4
+     * 解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     *      注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。
+     *      因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。
+     *
+     * 示例 3:
+     * 输入: [7,6,4,3,1]
+     * 输出: 0
+     * 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+     *  
+     *
+     * 提示：
+     * 1 <= prices.length <= 3 * 10 ^ 4
+     * 0 <= prices[i] <= 10 ^ 4
+     */
+    public int maxProfit2(int[] prices) {
+        int profit = 0;
+        int curProfile = 0;
+        if(prices.length > 1) {
+            int buy = prices[0];
+            for (int i = 1; i < prices.length; i++) {
+                int sellProfile = prices[i] - buy;
+                if(sellProfile <= curProfile){
+                    profit += curProfile;
+                    curProfile = 0;
+                    buy = prices[i];
+                }else{
+                    curProfile = sellProfile;
+                }
+            }
+        }
+        return profit+curProfile;
+    }
+
+    /**
+     * 给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
+     * 说明：本题中，我们将空字符串定义为有效的回文串。
+     *
+     * 示例 1:
+     * 输入: "A man, a plan, a canal: Panama"
+     * 输出: true
+     *
+     * 示例 2:
+     * 输入: "race a car"
+     * 输出: false
+     */
+    public boolean isPalindrome(String s) {
+        int start = 0,end = s.length()-1;
+        while(end-start > 0){
+            char startC = s.charAt(start);
+            if(!Character.isLetterOrDigit(startC)){
+                start++;
+                continue;
+            }
+            char endC = s.charAt(end);
+            if(!Character.isLetterOrDigit(endC)){
+                end--;
+                continue;
+            }
+            if(Character.toLowerCase(startC) != Character.toLowerCase(endC)){
+                return false;
+            }
+            start++;
+            end--;
+        }
+        return true;
+    }
+
+    /**
+     * 给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+     * 说明：
+     * 你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+     *
+     * 示例 1:
+     * 输入: [2,2,1]
+     * 输出: 1
+     *
+     * 示例 2:
+     * 输入: [4,1,2,1,2]
+     * 输出: 4
+     */
+    public int singleNumber(int[] nums) {
+        for (int i = 1; i < nums.length; i++) {
+            nums[0] ^= nums[i];
+        }
+        return nums[0];
+    }
+
+    /**
+     * 给定一个链表，判断链表中是否有环。
+     * 如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。
+     * 如果链表中存在环，则返回 true 。 否则，返回 false 。
+     *
+     * 进阶：
+     * 你能用 O(1)（即，常量）内存解决此问题吗？
+     *
+     * 示例 1：
+     * 输入：head = [3,2,0,-4], pos = 1
+     * 输出：true
+     * 解释：链表中有一个环，其尾部连接到第二个节点。
+     *
+     * 示例 2：
+     * 输入：head = [1,2], pos = 0
+     * 输出：true
+     * 解释：链表中有一个环，其尾部连接到第一个节点。
+     *
+     * 示例 3：
+     * 输入：head = [1], pos = -1
+     * 输出：false
+     * 解释：链表中没有环。
+     *  
+     *
+     * 提示：
+     * 链表中节点的数目范围是 [0, 104]
+     * -105 <= Node.val <= 105
+     * pos 为 -1 或者链表中的一个 有效索引 。
+     */
+    public boolean hasCycle(ListNode head) {
+        while (head != null){
+            if(head.val == 106){
+                return true;
+            }else{
+                head.val = 106;
+            }
+            head = head.next;
+        }
+        return false;
+    }
+
+    /**
+     * 设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+     * push(x) —— 将元素 x 推入栈中。
+     * pop() —— 删除栈顶的元素。
+     * top() —— 获取栈顶元素。
+     * getMin() —— 检索栈中的最小元素。
+     *  
+     * 示例:
+     * 输入：
+     * ["MinStack","push","push","push","getMin","pop","top","getMin"]
+     * [[],[-2],[0],[-3],[],[],[],[]]
+     * 输出：
+     * [null,null,null,null,-3,null,0,-2]
+     *
+     * 解释：
+     * MinStack minStack = new MinStack();
+     * minStack.push(-2);
+     * minStack.push(0);
+     * minStack.push(-3);
+     * minStack.getMin();   --> 返回 -3.
+     * minStack.pop();
+     * minStack.top();      --> 返回 0.
+     * minStack.getMin();   --> 返回 -2.
+     *  
+     * 提示：
+     * pop、top 和 getMin 操作总是在 非空栈 上调用。
+     */
+    /**
+     * 解法1：这种方式有点大材小用了，并不需要排序。每次入栈或出栈只需要记住当前栈的最小值就可以了
+     */
+    class MinStack {
+        Stack<ListNode> stack = new Stack<>();
+        ListNode minListNode = null;
+        public MinStack() {
+
+        }
+
+        public void push(int x) {
+            ListNode listNode = new ListNode(x);
+            if(minListNode == null){
+                minListNode = listNode;
+            }else{
+                ListNode preListNode = null;
+                ListNode nextListNode = minListNode;
+                while(nextListNode != null){
+                    if(nextListNode.val >= listNode.val){
+                        listNode.next = nextListNode;
+                        if(preListNode == null){
+                            minListNode = listNode;
+                        }else{
+                            preListNode.next = listNode;
+                        }
+                        break;
+                    }
+                    preListNode = nextListNode;
+                    nextListNode = nextListNode.next;
+                }
+            }
+            stack.push(listNode);
+        }
+
+        public void pop() {
+            ListNode pop = stack.pop();
+            if(minListNode.val == pop.val && minListNode.next == pop.next){
+                minListNode = minListNode.next;
+            }else{
+                ListNode preListNode = minListNode;
+                ListNode nextListNode= minListNode.next;
+                while(nextListNode != null){
+                    if(nextListNode.val == pop.val && nextListNode.next == pop.next){
+                        preListNode.next = nextListNode.next;
+                        break;
+                    }
+                    preListNode = nextListNode;
+                    nextListNode = nextListNode.next;
+                }
+            }
+        }
+
+        public int top() {
+            return stack.peek().val;
+        }
+
+        public int getMin() {
+            return minListNode.val;
+        }
+    }
+    /**
+     * 解法2
+     */
+//    class MinStack {
+//        class Pair{
+//            int first;
+//            int second;
+//            Pair(int f, int s){
+//                first = f;
+//                second = s;
+//            }
+//        }
+//        Stack<Pair> stack = new Stack<>();
+//        public MinStack() {
+//
+//        }
+//
+//        public void push(int x) {
+//            int min = x;
+//            if(!stack.isEmpty()){
+//                min = stack.peek().second;
+//            }
+//            stack.push(new Pair(x, Math.min(x, min)));
+//        }
+//
+//        public void pop() {
+//            stack.pop();
+//        }
+//
+//        public int top() {
+//            return stack.peek().first;
+//        }
+//
+//        public int getMin() {
+//            return stack.peek().second;
+//        }
+//    }
+
 
 }
