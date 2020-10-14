@@ -6,7 +6,8 @@ public class LeetCode {
     public static void main(String[] args){
 //        LeetCode leetCode = new LeetCode();
 //        System.out.println(leetCode.mySqrt(9));
-        System.out.println(0b101^0b11);
+//        System.out.println(0b101^0b11);
+        System.out.println(Math.log(26) / Math.log(5));
     }
 
     /**
@@ -1498,6 +1499,226 @@ public class LeetCode {
 //            return stack.peek().second;
 //        }
 //    }
+
+    /**
+     * 编写一个程序，找到两个单链表相交的起始节点。
+     * 如下面的两个链表：（图）
+     * 在节点 c1 开始相交。
+     *
+     * 示例 1：
+     * 输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+     * 输出：Reference of the node with value = 8
+     * 输入解释：相交节点的值为 8 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+     *  
+     *
+     * 示例 2：
+     * 输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+     * 输出：Reference of the node with value = 2
+     * 输入解释：相交节点的值为 2 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+     *  
+     *
+     * 示例 3：
+     * 输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+     * 输出：null
+     * 输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+     * 解释：这两个链表不相交，因此返回 null。
+     *  
+     *
+     * 注意：
+     * 如果两个链表没有交点，返回 null.
+     * 在返回结果后，两个链表仍须保持原有的结构。
+     * 可假定整个链表结构中没有循环。
+     * 程序尽量满足 O(n) 时间复杂度，且仅用 O(1) 内存。
+     */
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if(headA == null || headB == null){
+            return null;
+        }
+        ListNode a = headA;
+        ListNode b = headB;
+        // 其实就是让headA和headB剪切掉比另一个多的头部之后再同步比较，这种写法也太妙了吧，想破头也想不出来
+        while(a != b){
+            a = a == null ? headB : a.next;
+            b = b == null ? headA : b.next;
+        }
+        return a;
+    }
+
+    /**
+     * 给定一个已按照升序排列 的有序数组，找到两个数使得它们相加之和等于目标数。
+     * 函数应该返回这两个下标值 index1 和 index2，其中 index1 必须小于 index2。
+     *
+     * 说明:
+     * 返回的下标值（index1 和 index2）不是从零开始的。
+     * 你可以假设每个输入只对应唯一的答案，而且你不可以重复使用相同的元素。
+     *
+     * 示例:
+     * 输入: numbers = [2, 7, 11, 15], target = 9
+     * 输出: [1,2]
+     * 解释: 2 与 7 之和等于目标数 9 。因此 index1 = 1, index2 = 2 。
+     */
+    public int[] twoSum2(int[] numbers, int target) {
+//        int index1 = 0,index2 = 1;
+//        while(index1<numbers.length){
+//            int sum = numbers[index1] + numbers[index2];
+//            if(sum == target){
+//                break;
+//            }else if(sum > target || index2 == numbers.length-1){
+//                index1++;
+//                index2 = index1+1;
+//            }else{
+//                index2++;
+//            }
+//        }
+//        return new int[]{index1+1,index2+1};
+
+        // 解法2
+        int index1 = 0,index2 = numbers.length-1;
+        while(index1 != index2){
+            int sum = numbers[index1] + numbers[index2];
+            if(sum == target){
+                break;
+            }else if(sum > target){
+                index2--;
+            }else{
+                index1++;
+            }
+        }
+        return new int[]{index1+1,index2+1};
+    }
+
+    /**
+     * 给定一个正整数，返回它在 Excel 表中相对应的列名称。
+     *
+     * 例如，
+     *     1 -> A
+     *     2 -> B
+     *     3 -> C
+     *     ...
+     *     26 -> Z
+     *     27 -> AA
+     *     28 -> AB
+     *     ...
+     *
+     * 示例 1:
+     * 输入: 1
+     * 输出: "A"
+     *
+     * 示例 2:
+     * 输入: 28
+     * 输出: "AB"
+     *
+     * 示例 3:
+     * 输入: 701
+     * 输出: "ZY"
+     */
+    public String convertToTitle(int n) {
+        String columnChar = "ZABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder stringBuilder = new StringBuilder();
+        while(n>26){
+            int index = n % 26;
+            stringBuilder.append(columnChar.charAt(index));
+            n = (n - index)/26;
+            if(index == 0){
+                n--;
+            }
+        }
+        stringBuilder.append(columnChar.charAt(n));
+        return stringBuilder.reverse().toString();
+    }
+
+    /**
+     * 给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
+     * 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+     *
+     * 示例 1:
+     * 输入: [3,2,3]
+     * 输出: 3
+     *
+     * 示例 2:
+     * 输入: [2,2,1,1,1,2,2]
+     * 输出: 2
+     */
+    public int majorityElement(int[] nums) {
+        Map<Integer, Integer> map= new HashMap<>();
+        for (int num : nums) {
+            if(map.containsKey(num)){
+                map.put(num, map.get(num)+1);
+            }else{
+                map.put(num, 1);
+            }
+            if(map.get(num)+1 > nums.length/2){
+                return num;
+            }
+        }
+        return 0;
+        // 解法2，排序取中间值
+    }
+
+    /**
+     * 给定一个Excel表格中的列名称，返回其相应的列序号。
+     * 例如，
+     *     A -> 1
+     *     B -> 2
+     *     C -> 3
+     *     ...
+     *     Z -> 26
+     *     AA -> 27
+     *     AB -> 28
+     *     ...
+     *
+     * 示例 1:
+     * 输入: "A"
+     * 输出: 1
+     *
+     * 示例 2:
+     * 输入: "AB"
+     * 输出: 28
+     *
+     * 示例 3:
+     * 输入: "ZY"
+     * 输出: 701
+     */
+
+    public int titleToNumber(String s) {
+        String columnChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int num = 0;
+        int scale = 1;
+        for (int i = s.length()-1; i >= 0; i--) {
+            num += (columnChar.indexOf(s.charAt(i))+1) * scale;
+            scale *= 26;
+        }
+        return num;
+    }
+
+    /**
+     * 给定一个整数 n，返回 n! 结果尾数中零的数量。
+     *
+     * 示例 1:
+     * 输入: 3
+     * 输出: 0
+     * 解释: 3! = 6, 尾数中没有零。
+     *
+     * 示例 2:
+     * 输入: 5
+     * 输出: 1
+     * 解释: 5! = 120, 尾数中有 1 个零.
+     * 说明: 你算法的时间复杂度应为 O(log n) 。
+     */
+    public int trailingZeroes(int n) {
+        int num0 = 0;
+        for (int i = 5; i <= n; i = i+5) {
+            num0 += num5(i);
+        }
+        return num0;
+    }
+
+    private int num5(int n){
+        if(n%5 == 0){
+            return 1+num5(n/5);
+        }
+        return 0;
+    }
 
 
 }
